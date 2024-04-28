@@ -61,4 +61,3 @@ public:
 	void render(sf::RenderWindow& window, const glm::mat4& model, const glm::mat4& view, const glm::mat4& proj) const;
 
 };
-

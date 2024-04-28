@@ -130,4 +130,3 @@ Mesh3D Mesh3D::house(sf::Color color) {
 
 	return Mesh3D(std::move(verts), std::move(tris), color);
 }
-

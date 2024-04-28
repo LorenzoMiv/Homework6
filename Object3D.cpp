@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Transform.hpp>
 
 
+
 void Object3D::rebuildModelMatrix() {
 	// Initialize the model matrix as the identity matrix.
 	auto model = glm::mat4(1);
@@ -34,6 +35,22 @@ Object3D::Object3D(std::shared_ptr<Mesh3D>&& mesh) : m_mesh(mesh), m_position(),
 	rebuildModelMatrix();
 }
 
+const glm::vec3& Object3D::getVelocity() const {
+	return curr_velocity;
+}
+
+const glm::vec3& Object3D::getAcceleration() const {
+	return curr_acceleration;
+}
+
+const glm::vec3& Object3D::getRotVelocity() const {
+	return rot_velocity;
+}
+
+const glm::vec3& Object3D::getRotAcceleration() const {
+	return rot_acceleration;
+}
+
 const glm::vec3& Object3D::getPosition() const {
 	return m_position;
 }
@@ -61,6 +78,26 @@ void Object3D::setScale(const glm::vec3& scale) {
 	rebuildModelMatrix();
 }
 
+void Object3D::setVelocity(const glm::vec3& velocity) {
+	curr_velocity = velocity;
+	rebuildModelMatrix();
+}
+
+void Object3D::setAcceleration(const glm::vec3& acceleration) {
+	curr_acceleration = acceleration;
+	rebuildModelMatrix();
+}
+
+void Object3D::setRotAcceleration(const glm::vec3& rotAcceleration) {
+	rot_acceleration = rotAcceleration;
+	rebuildModelMatrix();
+}
+
+void Object3D::setRotVelocity(const glm::vec3& rotVelocity) {
+	rot_velocity = rotVelocity;
+	rebuildModelMatrix();
+}
+
 void Object3D::move(const glm::vec3& offset) {
 	m_position = m_position + offset;
 	rebuildModelMatrix();
@@ -75,24 +112,16 @@ void Object3D::grow(const glm::vec3& growth) {
 	m_scale = m_scale * growth;
 	rebuildModelMatrix();
 }
-/*
-void Object3D::translate(const glm::vec3& translate) {
-	m_position.x = m_position.x + translate.x;
-	m_position.y = m_position.y + translate.y;
-	m_position.z = m_position.z + translate.z;
-	rebuildModelMatrix();
-}
 
-void Object3D::bezierTranslation(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, float_t t) {
-	m_position.x = ;
-	m_position.y = pow((1 - t), 3) * p0.y + 3 * pow((1 - t), 2) * t * p1.y + 3 * (1 - t) * pow(t, 2) * p2.y + pow(t, 3) * p3.y;
-	m_position.z = pow((1 - t), 3) * p0.z + 3 * pow((1 - t), 2) * t * p1.z + 3 * (1 - t) * pow(t, 2) * p2.z + pow(t, 3) * p3.z;
+void Object3D::tick(float_t dt) {
+	rot_velocity += rot_acceleration * dt;
+	m_orientation += rot_velocity * dt;
+	curr_velocity += curr_acceleration * dt;
+	m_position += curr_velocity * dt;
 	rebuildModelMatrix();
 }
-*/
 
 
 void Object3D::render(sf::RenderWindow& window, const glm::mat4& view, const glm::mat4& proj) const {
 	m_mesh->render(window, m_modelMatrix, view, proj);
 }
-

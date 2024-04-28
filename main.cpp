@@ -3,6 +3,7 @@
 
 #include "Mesh3D.h"
 #include "Object3D.h"
+#include <filesystem>
 
 #include <memory>
 #include <glm/ext.hpp>
@@ -24,7 +25,7 @@ int main() {
 	sf::RenderWindow window{ sf::VideoMode{1200, 800}, "SFML Demo" };
 	sf::Clock c;
 
-	
+
 
 	//TEST BUNNY:
 	auto bunny = assimpLoad("C:/Users/loren/Homework6/models/bunny.obj");
@@ -38,14 +39,15 @@ int main() {
 
 	//rotation animation: 
 	auto anim = Animator();
-	anim.addAnimation(std::make_unique<BezierTranslationAnimation>(square, 5, glm::vec3(-2.0, -2.0, -6.0), glm::vec3(2.0, -2.0, -3.0), glm::vec3(-2.0, -2.0, 3.0), glm::vec3(2.0, 0.0, -3.0)));
+	anim.addAnimation(std::make_unique<BezierTranslationAnimation>(square, 3, glm::vec3(-2.0, -2.0, -6.0), glm::vec3(2.0, -2.0, -3.0), glm::vec3(-2.0, -2.0, 3.0), glm::vec3(2.0, 0.0, -3.0)));
 	anim.addAnimation(std::make_unique<TranslationAnimation>(square, 2, glm::vec3(-5.0, 2.5, 0)));
 	anim.start();
 
 	auto anim2 = Animator();
-	anim2.addAnimation(std::make_unique<BezierTranslationAnimation>(square2, 5, glm::vec3(-2.0, 2.0, 6.0), glm::vec3(2.0, -2.0, 3.0), glm::vec3(-2.0, 2.0, -3.0), glm::vec3(2.0, 0.0, 3.0)));
+	anim2.addAnimation(std::make_unique<BezierTranslationAnimation>(square2, 3, glm::vec3(-2.0, 2.0, 6.0), glm::vec3(2.0, -2.0, 3.0), glm::vec3(-2.0, 2.0, -3.0), glm::vec3(2.0, 0.0, 3.0)));
 	anim2.addAnimation(std::make_unique<PauseAnimation>(square2, 2.5));
 	anim2.addAnimation(std::make_unique<RotationAnimation>(square2, 1, glm::vec3(0.0, 0.0, 2.0 * acos(-1.0))));
+
 	anim2.start();
 
 	//auto anim3 = Animator();
@@ -66,12 +68,17 @@ int main() {
 	//SQUARE TEST:
 	square.move(glm::vec3(0, 0, -3));
 
-	square2.move(glm::vec3(0, 0, -1));
+	//square2.move(glm::vec3(0, 0, -1));
 
 	//BUNNY TEST: 
+
 	bunny.move(glm::vec3(0.2, -1.0, -3.0));
 	bunny.grow(glm::vec3(9.0));
 
+	square2.setVelocity(glm::vec3(0.0, 0.5, 0.0));
+	square2.setAcceleration(glm::vec3(5.0, -0.5, 0.0));
+	square2.setRotAcceleration(glm::vec3(0.0, 1.0, 0.0));
+	square2.setRotVelocity(glm::vec3(2.0, 0, 0));
 
 	auto last = c.getElapsedTime();
 	while (window.isOpen()) {
@@ -85,9 +92,15 @@ int main() {
 		window.clear();
 		//SQUARE TEST: 
 		//square.rotate(glm::vec3(0.001, 0, 0));
-		square.render(window, view, proj);
+		//square2.setVelocity(glm::vec3(0.0, 0.0, 3.0));
+
+
+
+
+		//square.render(window, view, proj);
 		square2.render(window, view, proj);
-		
+
+
 
 		//BUNNY TEST:
 		//bunny.rotate(glm::vec3(0.0, 0.001, 0.0));
@@ -97,7 +110,25 @@ int main() {
 
 		auto now = c.getElapsedTime();
 		auto diff = now - last;
-		anim2.tick(diff.asSeconds());
+		//anim2.tick(diff.asSeconds());
+		//square2.tick(diff.asSeconds());
+		
+		if (square2.getPosition().x > 2) {
+			square2.setVelocity(-square2.getVelocity());
+		}
+
+		if (square2.getPosition().x < -3) {
+			square2.setVelocity(-square2.getVelocity());
+		}
+
+
+		square2.tick(diff.asSeconds());
+		
+		//std::cout << "x: " << square2.getPosition().x << ", " << "z: " << square2.getPosition().z << std::endl;
+		
+		
+		
+
 		anim.tick(diff.asSeconds());
 		//anim3.tick(diff.asSeconds());
 		std::cout << 1 / diff.asSeconds() << " FPS " << std::endl;

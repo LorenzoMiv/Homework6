@@ -78,4 +78,3 @@ Object3D assimpLoad(const std::string& path, size_t vertexAttributes) {
 	return ret;
 }
 
-
