@@ -144,22 +144,27 @@ Scene lifeOfPi() {
 
 Scene skull() {
 	//MOUNTAINS?
-	auto mountains = assimpLoad("./snow_mountain/Snow_Mountain.obj", true);
-	mountains.move(glm::vec3(0, -5, -20));
-	mountains.grow(glm::vec3(25));
+	auto mountains = assimpLoad("./mountain_mesh/mountain.obj", true);
+	mountains.move(glm::vec3(0, -12.5, -50));
+	mountains.grow(glm::vec3(3.0));
+
+	auto moon = assimpLoad("./moon/moon/moon.obj", true);
+	moon.move(glm::vec3(0, 40, -80));
+	moon.grow(glm::vec3(0.3));
 
 	//SKULL 
 	auto skull = assimpLoad("./skull/skull/skull.obj", true);
-	skull.move(glm::vec3(0, 0, -15.0));
+	skull.move(glm::vec3(0, -1, -15.0));
 	skull.setOrientation(glm::vec3(4.5, 9.5, 9.5));
 	skull.grow(glm::vec3(0.2, 0.2, 0.2));
-
+	
 	//EYEBALL 1
 	auto eye1 = assimpLoad("./human_eye/Human Eye.obj", true);
 	eye1.move(glm::vec3(-4, -15, 14.5));
 	eye1.grow(glm::vec3(1.75, 1.75, 1.75));
 	eye1.setOrientation(glm::vec3(0, 0, 0));
 	skull.addChild(std::move(eye1));
+	
 
 	//EYEBALL 2
 	auto eye2 = assimpLoad("./human_eye/Human Eye.obj", true);
@@ -172,15 +177,18 @@ Scene skull() {
 	std::vector<Object3D> objects;
 	objects.push_back(std::move(skull));
 	objects.push_back(std::move(mountains));
+	objects.push_back(std::move(moon));
+
+	
 	
 	/*
 	note: skull children : 
-	0 - lower skull(jaw bone), 
-	1 - upper teeth, 
-	2 - lower teeth, 
-	3 - upper skull, 
-	4 - right eye ball / socket
-	5 - left eye ball / socket
+	0 - lower skull(jaw bone),	|| parent - calvaria
+	1 - upper teeth,			|| parent - calvaria
+	2 - lower teeth,			|| parent - jaw
+	3 - upper skull,			|| calvaria
+	4 - right eye ball / socket || parent - calvaria
+	5 - left eye ball / socket  || parent - calvaria
 	*/
 
 
@@ -234,16 +242,22 @@ int main() {
 	auto& calvaria = skull.getChild(3);
 	auto& eye1 = skull.getChild(4);
 	auto& eye2 = skull.getChild(5);
+	
+
+
+	//auto& jaw_botTeeth = scene2.objects[2];
+	jaw.addChild(std::move(botTeeth));
 
 	//OBJECT VELOCITY:
 	//skull.setVelocity(glm::vec3(0.0, -0.0075, -1.0));
-	jaw.setVelocity(glm::vec3(0.0, -0.5, -1.0));
-	calvaria.setVelocity(glm::vec3(0.0, 0.5, -1.0));
-	eye1.setVelocity(glm::vec3(-1.0, 1, -0.075));
-	eye2.setVelocity(glm::vec3(1.0, 1, -0.075));
-	topTeeth.setVelocity(glm::vec3(-1.0, -1, -0.075));
-	botTeeth.setVelocity(glm::vec3(1.0, 1, -0.075));
+	jaw.setVelocity(glm::vec3(0.0, -2.0, -0.5));
+	//calvaria.setVelocity(glm::vec3(0.0, 0.5, 0));
+	//eye1.setVelocity(glm::vec3(-1.0, 1, 0));
+	//eye2.setVelocity(glm::vec3(1.0, 1, 0));
+	//topTeeth.setVelocity(glm::vec3(-1.0, -1, 0));
+	//botTeeth.setVelocity(glm::vec3(0.0, -0.5, -0.5));
 
+	//jaw_botTeeth.setVelocity(glm::vec3(0.0, -0.5, -0.5));
 	//eye2.setVelocity(glm::vec3(2.0, 0.5, 0.0));
 	//auto& mountains = scene2.objects[1];
 	//auto& boat = scene2.objects[2];
@@ -295,12 +309,24 @@ int main() {
 		last = now;
 
 		//eye1.render(window, mainShader);
-		eye1.tick(diffSeconds);
-		eye2.tick(diffSeconds);
-		topTeeth.tick(diffSeconds);
-		botTeeth.tick(diffSeconds);
+		//eye1.tick(diffSeconds);
+		//eye2.tick(diffSeconds);
+		//topTeeth.tick(diffSeconds);
+		//botTeeth.tick(diffSeconds);
+		
 		jaw.tick(diffSeconds);
-		calvaria.tick(diffSeconds);
+
+		if (jaw.getPosition().y >= 0) {
+			jaw.setVelocity(-jaw.getVelocity());
+		}
+
+		if (jaw.getPosition().y < -4.0) {
+			jaw.setVelocity(-jaw.getVelocity());
+		}
+
+		
+		
+		//calvaria.tick(diffSeconds);
 		//skull.tick(diffSeconds);
 		for (auto& animator : scene2.animators) {
 			animator.tick(diffSeconds);
